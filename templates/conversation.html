@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="conversation-container">
+    <div class="conversation-header">
+        <img src="{{ url_for('static', filename='uploads/' + other_user.profile_pic) }}" 
+             alt="{{ other_user.username }}'s profile picture">
+        <h4>{{ other_user.username }}</h4>
+    </div>
+    
+    <div class="messages-container" id="messages-container">
+        {% for message in messages %}
+            <div class="message {% if message.sender_id == current_user.id %}message-sent{% else %}message-received{% endif %}">
+                <div class="message-bubble">
+                    {{ message.content }}
+                    <div class="message-timestamp">
+                        {{ message.timestamp.strftime('%H:%M') }}
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+    
+    <form method="POST" class="conversation-input">
+        <input type="text" 
+               name="message" 
+               id="message-input" 
+               placeholder="Écrire un message..." 
+               required 
+               autocomplete="off">
+        <button type="submit" class="btn btn-primary">
+            <i class="fas fa-paper-plane"></i>
+        </button>
+    </form>
+</div>
+
+<script>
+    function scrollToBottom() {
+        const container = document.getElementById('messages-container');
+        container.scrollTop = container.scrollHeight;
+    }
+
+    // Scroll to bottom on page load
+    scrollToBottom();
+
+    // Focus on input
+    document.getElementById('message-input').focus();
+
+    // Optional: Auto-scroll when new messages are added
+    const messageForm = document.querySelector('form');
+    messageForm.addEventListener('submit', () => {
+        setTimeout(scrollToBottom, 100);
+    });
+</script>
+{% endblock %}

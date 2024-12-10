@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="home-container">
+    <div class="sidebar-content">
+        <!-- Section Stories -->
+        <section class="stories-section">
+            {% for story in stories %}
+            <div class="story-item" style="background-image: url('{{ url_for('static', filename='uploads/' + story.image_path) }}')">
+                <div class="story-overlay">
+                    <small>{{ story.author.username }}</small>
+                </div>
+            </div>
+            {% endfor %}
+        </section>
+
+        <!-- Bouton Créer une Publication -->
+        <a href="{{ url_for('create_post') }}" class="create-post-btn">
+            <i class="fas fa-plus"></i>
+        </a>
+    </div>
+
+    <div class="posts-feed">
+        {% for post in posts %}
+        <div class="post-card">
+            <div class="post-header">
+                <img src="{{ url_for('static', filename='uploads/' + post.author.profile_pic) }}" 
+                     alt="{{ post.author.username }}" 
+                     class="post-user-avatar">
+                <a href="{{ url_for('profile', username=post.author.username) }}" class="text-dark">
+                    <strong>{{ post.author.username }}</strong>
+                </a>
+            </div>
+
+            <img src="{{ url_for('static', filename='uploads/' + post.image_path) }}" 
+                 alt="Publication" 
+                 class="post-image">
+
+            <div class="post-actions">
+                <div class="post-interactions">
+                    <form action="{{ url_for('like_post', post_id=post.id) }}" method="POST" class="d-inline">
+                        <button type="submit" class="post-interaction-btn {% if current_user.is_authenticated and post.likes|selectattr('user_id', 'equalto', current_user.id)|list %}liked{% endif %}">
+                            <i class="{% if current_user.is_authenticated and post.likes|selectattr('user_id', 'equalto', current_user.id)|list %}fas{% else %}far{% endif %} fa-heart"></i>
+                            {{ post.likes|length }}
+                        </button>
+                    </form>
+
+                    <button class="post-interaction-btn" onclick="focusComment({{ post.id }})">
+                        <i class="far fa-comment"></i>
+                        {{ post.comments|length }}
+                    </button>
+                </div>
+                <small class="text-muted">{{ post.timestamp.strftime('%d/%m/%Y %H:%M') }}</small>
+            </div>
+
+            <div class="p-3">
+                <p>
+                    <strong>{{ post.author.username }}</strong> 
+                    {{ post.caption }}
+                </p>
+
+                {% if post.comments %}
+                <div class="comments">
+                    {% for comment in post.comments|sort(attribute='timestamp') %}
+                    <div class="comment">
+                        <strong>{{ comment.author.username }}</strong> 
+                        {{ comment.content }}
+                        <br>
+                        <small class="text-muted">{{ comment.timestamp.strftime('%d/%m/%Y %H:%M') }}</small>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+                {% if current_user.is_authenticated %}
+                <div class="comment-input">
+                    <form action="{{ url_for('add_comment', post_id=post.id) }}" method="POST" class="d-flex w-100">
+                        <input type="text" name="content" class="form-control" placeholder="Ajouter un commentaire..." required>
+                        <button type="submit" class="btn btn-primary">Envoyer</button>
+                    </form>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<script>
+function focusComment(postId) {
+    const commentInput = document.querySelector(`form[action$="${postId}"] input`);
+    if (commentInput) {
+        commentInput.focus();
+    }
+}
+</script>
+{% endblock %}

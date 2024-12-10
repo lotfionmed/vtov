@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <div class="create-post-card">
+        <div class="create-post-header">
+            <h4>Créer une nouvelle publication</h4>
+        </div>
+        <form method="POST" enctype="multipart/form-data">
+            <div class="file-upload-container">
+                <label for="image" class="file-upload-label">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    <p>Glissez et déposez votre photo ici<br>ou cliquez pour sélectionner</p>
+                    <input type="file" id="image" name="image" class="file-upload-input" accept="image/*" required>
+                </label>
+                <div id="image-preview" class="mt-3" style="display: none;">
+                    <img src="" alt="Aperçu" style="max-width: 100%; border-radius: 10px;">
+                </div>
+            </div>
+            
+            <div class="caption-container">
+                <textarea class="caption-input" id="caption" name="caption" rows="3" placeholder="Écrivez une légende pour votre photo..."></textarea>
+            </div>
+            
+            <button type="submit" class="comment-input button">Publier</button>
+        </form>
+    </div>
+</div>
+
+<script>
+document.getElementById('image').onchange = function(e) {
+    const preview = document.getElementById('image-preview');
+    const file = e.target.files[0];
+    const reader = new FileReader();
+
+    reader.onload = function(e) {
+        preview.querySelector('img').src = e.target.result;
+        preview.style.display = 'block';
+    }
+
+    if (file) {
+        reader.readAsDataURL(file);
+    }
+};
+
+// Gestion du drag & drop
+const dropZone = document.querySelector('.file-upload-label');
+
+['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+    dropZone.addEventListener(eventName, preventDefaults, false);
+});
+
+function preventDefaults(e) {
+    e.preventDefault();
+    e.stopPropagation();
+}
+
+['dragenter', 'dragover'].forEach(eventName => {
+    dropZone.addEventListener(eventName, highlight, false);
+});
+
+['dragleave', 'drop'].forEach(eventName => {
+    dropZone.addEventListener(eventName, unhighlight, false);
+});
+
+function highlight(e) {
+    dropZone.classList.add('highlight');
+}
+
+function unhighlight(e) {
+    dropZone.classList.remove('highlight');
+}
+
+dropZone.addEventListener('drop', handleDrop, false);
+
+function handleDrop(e) {
+    const dt = e.dataTransfer;
+    const files = dt.files;
+    const fileInput = document.getElementById('image');
+    
+    fileInput.files = files;
+    fileInput.dispatchEvent(new Event('change'));
+}
+</script>
+{% endblock %}

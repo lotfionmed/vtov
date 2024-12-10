@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VtoV Social</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/modern.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .post-card {
+            margin-bottom: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .post-image {
+            max-width: 100%;
+            border-radius: 10px 10px 0 0;
+        }
+        .post-actions {
+            padding: 10px;
+            border-top: 1px solid #eee;
+        }
+        .post-caption {
+            padding: 15px;
+        }
+        .nav-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+        }
+        .nav-auth-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        .nav-auth-buttons .btn {
+            padding: 8px 16px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        .btn-primary {
+            background-color: #007bff;
+            color: white;
+            border: 1px solid #007bff;
+        }
+        .btn-outline-primary {
+            background-color: transparent;
+            color: #007bff;
+            border: 1px solid #007bff;
+        }
+        .btn-primary:hover {
+            background-color: #0056b3;
+            border-color: #0056b3;
+        }
+        .btn-outline-primary:hover {
+            background-color: #007bff;
+            color: white;
+        }
+        /* Styles pour les formulaires et les cartes */
+        .card {
+            border: none;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            border-radius: 15px;
+            overflow: hidden;
+            transition: transform 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        .card-header {
+            background: linear-gradient(135deg, #007bff, #0056b3);
+            color: white;
+            padding: 20px;
+            border: none;
+        }
+        .card-body {
+            padding: 30px;
+            background-color: #fff;
+        }
+        .form-control {
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 12px 15px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+        .form-control:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.15);
+        }
+        .form-label {
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 8px;
+        }
+        .btn {
+            padding: 12px 25px;
+            font-size: 16px;
+            font-weight: 600;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #007bff, #0056b3);
+            border: none;
+        }
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #0056b3, #004094);
+            transform: translateY(-2px);
+        }
+        /* Styles pour les liens */
+        a {
+            color: #007bff;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+        a:hover {
+            color: #0056b3;
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <nav class="top-nav">
+        <div class="container nav-content">
+            <a href="{{ url_for('index') }}" class="nav-brand">
+                <img src="{{ url_for('static', filename='logo.png') }}" alt="VtoV Logo" class="nav-logo">
+            </a>
+            {% if not current_user.is_authenticated %}
+            <div class="nav-auth-buttons">
+                <a href="{{ url_for('login') }}" class="btn btn-primary">Connexion</a>
+                <a href="{{ url_for('register') }}" class="btn btn-outline-primary">Inscription</a>
+            </div>
+            {% endif %}
+        </div>
+    </nav>
+
+    <div class="container grid-container">
+        {% if current_user.is_authenticated %}
+        <aside class="sidebar">
+            <nav>
+                <div class="sidebar-user-profile">
+                    <img src="{{ url_for('static', filename='uploads/' + current_user.profile_pic) }}" 
+                         alt="Profile" class="sidebar-profile-pic">
+                    <h4>{{ current_user.username }}</h4>
+                </div>
+
+                <ul class="sidebar-nav">
+                    <li>
+                        <a href="{{ url_for('index') }}">
+                            <i class="fas fa-home"></i> Accueil
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ url_for('create_post') }}">
+                            <i class="fas fa-plus-square"></i> Publier
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ url_for('messages') }}">
+                            <i class="fas fa-envelope"></i> Messages
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ url_for('profile', username=current_user.username) }}">
+                            <i class="fas fa-user"></i> Mon Profil
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ url_for('edit_profile') }}">
+                            <i class="fas fa-cog"></i> Paramètres
+                        </a>
+                    </li>
+                    <li class="sidebar-logout">
+                        <a href="{{ url_for('logout') }}">
+                            <i class="fas fa-sign-out-alt"></i> Déconnexion
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+        {% endif %}
+
+        <main>
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category or 'info' }} alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
