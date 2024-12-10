@@ -2,37 +2,30 @@
 
 {% block content %}
 <div class="container">
-    <h2>Search Results for "{{ query }}"</h2>
+    <h2>Résultats de recherche pour "{{ query }}"</h2>
     
     {% if users %}
-        <div class="row">
+        <div class="search-results">
             {% for user in users %}
-                <div class="col-md-4 mb-3">
-                    <div class="card">
-                        <div class="card-body text-center">
-                            <img src="{{ url_for('static', filename='uploads/' + user.profile_pic) }}" 
-                                 class="rounded-circle mb-3" 
-                                 style="width: 100px; height: 100px; object-fit: cover;" 
-                                 alt="{{ user.username }}'s profile picture">
-                            <h5 class="card-title">{{ user.username }}</h5>
-                            <p class="card-text">
-                                {% if user.bio %}
-                                    {{ user.bio }}
-                                {% endif %}
-                            </p>
-                            <div class="d-flex justify-content-around">
-                                <a href="{{ url_for('profile', username=user.username) }}" class="btn btn-primary">View Profile</a>
-                                {% if current_user.is_authenticated and current_user.id != user.id %}
-                                    <a href="{{ url_for('conversation', user_id=user.id) }}" class="btn btn-outline-primary">Message</a>
-                                {% endif %}
-                            </div>
+                <div class="user-card">
+                    <img src="{{ url_for('static', filename='uploads/' + user.profile_pic) }}" alt="{{ user.username }}" class="user-avatar">
+                    <div class="user-info">
+                        <h3>{{ user.username }}</h3>
+                        <p>{{ user.bio or 'Pas de bio' }}</p>
+                        <div class="user-actions">
+                            <a href="{{ url_for('profile', username=user.username) }}" class="btn">Voir le profil</a>
+                            {% if current_user.is_authenticated and current_user.id != user.id %}
+                                <a href="{{ url_for('conversation', user_id=user.id) }}" class="btn">Envoyer un message</a>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
             {% endfor %}
         </div>
     {% else %}
-        <p class="alert alert-info">No users found matching your search.</p>
+        <p>Aucun utilisateur trouvé.</p>
     {% endif %}
+    
+    <a href="{{ url_for('search_users') }}" class="btn">Nouvelle recherche</a>
 </div>
 {% endblock %}

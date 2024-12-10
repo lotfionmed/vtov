@@ -258,17 +258,14 @@ def follow(username):
     db.session.commit()
     return redirect(url_for('profile', username=username))
 
-@app.route('/search', methods=['GET'])
+@app.route('/search_users', methods=['GET', 'POST'])
 def search_users():
-    query = request.args.get('q', '')
-    users = User.query.filter(
-        db.or_(
-            User.username.ilike(f'%{query}%'), 
-            User.email.ilike(f'%{query}%'),
-            User.interests.ilike(f'%{query}%')
-        )
-    ).limit(20).all()
-    return render_template('search_results.html', users=users, query=query)
+    if request.method == 'POST':
+        query = request.form['username']
+        # Recherche insensible à la casse et partielle
+        users = User.query.filter(User.username.ilike(f'%{query}%')).all()
+        return render_template('search_results.html', users=users, query=query)
+    return render_template('search_users.html')
 
 @app.route('/profile/edit', methods=['GET', 'POST'])
 @login_required

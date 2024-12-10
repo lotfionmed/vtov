@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <h2>Rechercher des Utilisateurs</h2>
+    <form action="{{ url_for('search_users') }}" method="POST" class="search-form">
+        <input type="text" name="username" placeholder="Entrez un nom d'utilisateur" required>
+        <button type="submit" class="search-button">Rechercher</button>
+    </form>
+</div>
+{% endblock %}
